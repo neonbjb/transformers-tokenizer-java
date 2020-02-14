@@ -53,11 +53,11 @@ public class GPT2TokenizerTest {
 
             List<Integer> inputIds = Arrays.stream(((JSONArray)encMap.get("input_ids")).toArray()).map(o -> Integer.parseInt(o.toString())).collect(Collectors.toList());
             assertThat(result.inputIds).containsExactlyElementsOf(inputIds);
-            List<Integer> tokenTypes = Arrays.stream(((JSONArray)encMap.get("token_type_ids")).toArray()).map(o -> Integer.parseInt(o.toString())).collect(Collectors.toList());
-            assertThat(result.specialTokensMask).containsExactlyElementsOf(tokenTypes);
             List<Integer> attMask = Arrays.stream(((JSONArray)encMap.get("attention_mask")).toArray()).map(o -> Integer.parseInt(o.toString())).collect(Collectors.toList());
             assertThat(result.attentionMask).containsExactlyElementsOf(attMask);
-            assertThat(Integer.parseInt(encMap.get("num_truncated_tokens").toString())).isEqualTo(result.truncatedTokensCount);
+            if(encMap.containsKey("num_truncated_tokens")) {
+                assertThat(Integer.parseInt(encMap.get("num_truncated_tokens").toString())).isEqualTo(result.truncatedTokensCount);
+            }
         }
     }
 }

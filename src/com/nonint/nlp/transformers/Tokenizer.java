@@ -181,16 +181,6 @@ public abstract class Tokenizer {
                     while(splitsIter.hasNext()) {
                         String split = splitsIter.next().stripTrailing();
                         while(split.startsWith("  ")) split = split.substring(1);
-                        // Take care of whitespace around the token. It should be removed.
-                        /*if(isFirst) {
-                            split = split.stripTrailing();
-                            isFirst = false;
-                        } else if(!splitsIter.hasNext()) {
-                            // Last token, only remove leading space.
-                            split = split.stripLeading();
-                        } else {
-                            split = split.strip();
-                        }*/
 
                         if(!split.isEmpty()) {
                             iter.add(TokenOrString.string(split.stripTrailing()));
@@ -244,7 +234,6 @@ public abstract class Tokenizer {
      * @param maxSeqLen Returned lists will be exactly this length (unlike the transformers lib, where this is just an upper bound.)
      *                  Note that this tokenizer will respect the max sequence length specified by the model configuration, so this
      *                  value cannot be bigger than that.
-     * @param padLeft When true, padding will be added to the left of the sequence. When false, it will be added to the right.
      */
     public EncoderResult encode(String text, int maxSeqLen) {
         ImmutableList<String> tokens = tokenize(text);
@@ -276,7 +265,8 @@ public abstract class Tokenizer {
 
             inputIdsBuilder.add(encoder.get(tok));
             attentionMaskBuilder.add(1);
-            specialTokensBuilder.add(additionalSpecialTokens.contains(tok) ? 1 : 0);
+            specialTokensBuilder.add(compiledSpecialTokenList.contains(tok) ? 1 : 0);
+            i++;
         }
         if(tokens.size() < maxSeqLen && paddingSide == PaddingBehavior.ON_RIGHT) {
             int pad = encoder.get(padToken.get());
